@@ -8,3 +8,8 @@ export interface TriviaData {
   correct_answer?: string;
   incorrect_answers?: string[];
 }
+
+export interface TriviaCategory {
+  id: string;
+  name: string;
+}

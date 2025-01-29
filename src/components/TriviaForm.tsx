@@ -1,22 +1,40 @@
 import {Picker} from '@react-native-picker/picker';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
-import {Alert, Button, StyleSheet, Text, TextInput, View} from 'react-native';
-import {getTrivia} from '../services/trivia.service';
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
+import {getCategories, getTrivia} from '../services/trivia.service';
 import {TriviaData} from '../models/trivia-data.type';
 import {trivaStore} from '../store/trivia.store';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 interface FormInputs extends TriviaData {}
 
 export const TriviaForm = (): React.JSX.Element => {
-  const {setQuestions, setLoader} = trivaStore();
+  const {
+    questions,
+    categories,
+    categoriesLoader,
+    setQuestions,
+    setQuestionsLoader,
+    setCategories,
+    setCategoriesLoader,
+  } = trivaStore();
   const navigation = useNavigation();
 
   const {
     control,
     handleSubmit,
-    formState: {errors, defaultValues},
+    formState: {errors},
   } = useForm<FormInputs>({
     defaultValues: {
       amount: undefined,
@@ -26,54 +44,63 @@ export const TriviaForm = (): React.JSX.Element => {
     },
   });
 
-  console.log('defaultValues -->', defaultValues);
+  useFocusEffect(
+    useCallback(() => {
+      if (questions.length > 0) {
+        setQuestions([]);
+      }
+    }, [questions, setQuestions]),
+  );
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      loadCategories();
+    }
+  }, []);
+
+  const loadCategories = async (): Promise<void> => {
+    setCategoriesLoader(true);
+    const categoriesResponse = await getCategories();
+    setCategories(categoriesResponse);
+    setCategoriesLoader(false);
+  };
 
   const onSubmit = async (data: FormInputs) => {
-    const {amount, category, difficulty, type} = data;
-    console.log(
-      '🚀 ~ onSubmit ~ amount, category, difficulty, type:',
-      amount,
-      category,
-      difficulty,
-      type,
-    );
     try {
-      setLoader(true);
+      setQuestionsLoader(true);
       const response = await getTrivia(data);
-      setLoader(false);
+      setQuestionsLoader(false);
       if (response.response_code === 0) {
         setQuestions(response.results ?? []);
-        Alert.alert('Éxito', 'Preguntas obtenidas correctamente.');
+        Alert.alert('Success', 'Questions obtained correctly.');
         navigation.navigate('trivia-challenge');
       } else {
-        Alert.alert(
-          'Error',
-          'No se encontraron preguntas, intenta en unos minutos.',
-        );
+        Alert.alert('Error', 'No questions found, try in a few minutes.');
       }
     } catch (error) {
-      Alert.alert(
-        'Error',
-        'Hubo un problema, intenta nuevamente en unos minutos.',
-      );
+      Alert.alert('Error', 'There was a problem, try again in a few minutes.');
       console.error(error);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Cantidad de preguntas:</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.label}>Number of questions:</Text>
       <Controller
         name="amount"
         control={control}
-        rules={{required: 'Este campo es obligatorio', min: 1}}
+        rules={{
+          required: 'This field is required',
+          min: {value: 1, message: 'The value must be greater than 1.'},
+          max: {value: 50, message: 'The value cannot be greater than 50.'},
+        }}
         render={({field: {onChange, value}}) => (
           <TextInput
             style={styles.input}
             keyboardType="numeric"
             value={value}
             onChangeText={onChange}
-            placeholder="Ej: 10"
+            placeholder="Ex: 10"
           />
         )}
       />
@@ -81,41 +108,51 @@ export const TriviaForm = (): React.JSX.Element => {
         <Text style={styles.errorText}>{errors.amount.message}</Text>
       )}
 
-      <Text style={styles.label}>Categoría:</Text>
+      <Text style={styles.label}>Category:</Text>
       <Controller
         name="category"
         control={control}
-        rules={{required: 'Selecciona una categoría'}}
-        render={({field: {onChange, value}}) => (
-          <Picker
-            selectedValue={value}
-            onValueChange={onChange}
-            style={styles.picker}>
-            <Picker.Item label="Selecciona una categoría" value="" />
-            <Picker.Item label="General Knowledge" value="9" />
-            <Picker.Item label="Entertainment: Books" value="10" />
-            <Picker.Item label="Science & Nature" value="17" />
-          </Picker>
-        )}
+        rules={{required: 'Select a category'}}
+        render={({field: {onChange, value}}) => {
+          return categoriesLoader ? (
+            <ActivityIndicator style={styles.loaderIndicator} size="large" />
+          ) : (
+            <Picker
+              selectedValue={value}
+              onValueChange={onChange}
+              style={styles.picker}
+              onFocus={Keyboard.dismiss}>
+              <Picker.Item label="SSelect a category" value="" />
+              {categories.map(category => (
+                <Picker.Item
+                  key={category.id}
+                  label={category.name}
+                  value={category.id}
+                />
+              ))}
+            </Picker>
+          );
+        }}
       />
       {errors.category && (
         <Text style={styles.errorText}>{errors.category.message}</Text>
       )}
 
-      <Text style={styles.label}>Dificultad:</Text>
+      <Text style={styles.label}>Difficulty:</Text>
       <Controller
         name="difficulty"
         control={control}
-        rules={{required: 'Selecciona una dificultad'}}
+        rules={{required: 'Select a difficulty'}}
         render={({field: {onChange, value}}) => (
           <Picker
             selectedValue={value}
             onValueChange={onChange}
-            style={styles.picker}>
-            <Picker.Item label="Selecciona una dificultad" value="" />
-            <Picker.Item label="Fácil" value="easy" />
-            <Picker.Item label="Media" value="medium" />
-            <Picker.Item label="Difícil" value="hard" />
+            style={styles.picker}
+            onFocus={Keyboard.dismiss}>
+            <Picker.Item label="Select a difficulty" value="" />
+            <Picker.Item label="Easy" value="easy" />
+            <Picker.Item label="Medium" value="medium" />
+            <Picker.Item label="Hard" value="hard" />
           </Picker>
         )}
       />
@@ -123,19 +160,20 @@ export const TriviaForm = (): React.JSX.Element => {
         <Text style={styles.errorText}>{errors.difficulty.message}</Text>
       )}
 
-      <Text style={styles.label}>Tipo de preguntas:</Text>
+      <Text style={styles.label}>Type of questions:</Text>
       <Controller
         name="type"
         control={control}
-        rules={{required: 'Selecciona el tipo de pregunta'}}
+        rules={{required: 'Select the type of question'}}
         render={({field: {onChange, value}}) => (
           <Picker
             selectedValue={value}
             onValueChange={onChange}
-            style={styles.picker}>
-            <Picker.Item label="Selecciona un tipo" value="" />
-            <Picker.Item label="Opción múltiple" value="multiple" />
-            <Picker.Item label="Verdadero/Falso" value="boolean" />
+            style={styles.picker}
+            onFocus={Keyboard.dismiss}>
+            <Picker.Item label="Select a type" value="" />
+            <Picker.Item label="Multiple choice" value="multiple" />
+            <Picker.Item label="True/False" value="boolean" />
           </Picker>
         )}
       />
@@ -143,8 +181,12 @@ export const TriviaForm = (): React.JSX.Element => {
         <Text style={styles.errorText}>{errors.type.message}</Text>
       )}
 
-      <Button title="Obtener preguntas" onPress={handleSubmit(onSubmit)} />
-    </View>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handleSubmit(onSubmit)}>
+        <Text style={styles.submitText}>Start Quiz 🚀</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
@@ -175,5 +217,23 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 14,
     marginBottom: 10,
+  },
+  loaderIndicator: {
+    flex: 1,
+  },
+  submitButton: {
+    marginTop: 12,
+    backgroundColor: '#007BFF',
+    padding: 15,
+    borderRadius: 10,
+    width: '80%',
+    justifyContent: 'center',
+    margin: 'auto',
+  },
+  submitText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

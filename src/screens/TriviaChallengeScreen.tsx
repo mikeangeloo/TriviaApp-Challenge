@@ -35,18 +35,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   backButton: {
-    width: 40,
+    width: 50,
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
     top: 20,
     left: 10,
-    padding: 10,
+    paddingVertical: 10,
     backgroundColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: 10,
   },
   backText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '900',
   },
 });

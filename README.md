@@ -1,4 +1,40 @@
+# Project Details
+
+- Project Name: Triva App
+- Framework: React Native
+
+#### Description:
+
+Trivia App is a mobile application developed with React Native that allows users to play a trivia game. It uses the Open Trivia Database public API to offer questions of various categories and difficulty levels. Users can answer multiple choice questions and receive instant feedback on whether their answers are correct or incorrect. At the end, the score obtained is displayed. The app is designed to provide a simple and fun experience on iOS and Android devices.
+
+#### Dependencies
+
+1. **@react-native-picker/picker**:
+   A picker component for React Native that allows you to create selection dropdown menus.
+
+2. **@react-navigation/native**:
+   Library for navigation in React Native applications, providing navigation between screens and route management.
+
+3. **@react-navigation/native-stack**:
+   React Navigation plugin to use high-performance navigation stacks with native animations.
+
+4. **he (HTML Entities)**:
+   A small library for encoding and decoding HTML entities.
+
+5. **react-hook-form**:
+   Library to manage forms in React and React Native efficiently and with minimal code.
+
+6. **react-native-screens**:
+   Optimizes navigation in React Native by enabling native screen management, improving performance.
+
+7. **zustand**:
+   A lightweight and flexible solution for state management in React applications, with a simple and efficient API.
+8. **API Trivia**:
+   Public API to obtain information from the Open Trivia Database.
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+
+---
 
 # Getting Started
 
