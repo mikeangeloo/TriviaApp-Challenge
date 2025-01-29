@@ -16,7 +16,7 @@ export const TriviaForm = (): React.JSX.Element => {
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: {errors, defaultValues},
   } = useForm<FormInputs>({
     defaultValues: {
       amount: undefined,
@@ -25,6 +25,8 @@ export const TriviaForm = (): React.JSX.Element => {
       type: '',
     },
   });
+
+  console.log('defaultValues -->', defaultValues);
 
   const onSubmit = async (data: FormInputs) => {
     const {amount, category, difficulty, type} = data;

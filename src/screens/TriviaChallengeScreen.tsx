@@ -1,34 +1,29 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect} from 'react';
-import {trivaStore} from '../store/trivia.store';
+import React from 'react';
 import {TriviaChallenge} from '../components/TriviaChallenge';
 import {useNavigation} from '@react-navigation/native';
+import {trivaStore} from '../store/trivia.store';
 
 export const TriviaChallengeScreen = (): React.JSX.Element => {
-  const isLoading = trivaStore(state => state.loader);
-  const {setLoader} = trivaStore();
   const navigation = useNavigation();
+  const {questions} = trivaStore();
 
-  useEffect(() => {
-    if (isLoading) {
-      console.log('🚀 ~ useEffect ~ isLoading:', isLoading);
-      setTimeout(() => {
-        setLoader(false);
-      }, 2000);
-    }
-  }, [isLoading, setLoader]);
-
-  return (
-    <View>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.backButton}>
-        <Text style={styles.backText}>←</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Trivia Challenge</Text>
-      <TriviaChallenge />
-    </View>
-  );
+  if (questions.length === 0) {
+    navigation.goBack();
+    return <></>;
+  } else {
+    return (
+      <>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}>
+          <Text style={styles.backText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Trivia Challenge</Text>
+        <TriviaChallenge />
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

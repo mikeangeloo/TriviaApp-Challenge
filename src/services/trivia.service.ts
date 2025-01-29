@@ -13,8 +13,18 @@ export const getTrivia = async (
     const {data} = await axios.get<TrivaApiReponse<TriviaData[]>>(API_URL, {
       params,
     });
-    console.log('🚀 ~ getTrivia ~ data:', data);
-    return data;
+    const info = {
+      ...data,
+      results: [
+        ...(data.results?.map((result, index) => ({
+          ...result,
+          question: result?.question?.replace(/&quot;/g, '"'),
+          id: index,
+        })) ?? []),
+      ],
+    };
+    console.log('🚀 ~ getTrivia ~ info:', info);
+    return info;
   } catch (error) {
     console.log(error);
     return {

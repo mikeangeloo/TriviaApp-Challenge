@@ -1,4 +1,5 @@
 export interface TriviaData {
+  id: number;
   type: string;
   difficulty: string;
   category: string | undefined;
