@@ -122,7 +122,7 @@ export const TriviaForm = (): React.JSX.Element => {
               onValueChange={onChange}
               style={styles.picker}
               onFocus={Keyboard.dismiss}>
-              <Picker.Item label="SSelect a category" value="" />
+              <Picker.Item label="Select a category" value="" />
               {categories.map(category => (
                 <Picker.Item
                   key={category.id}

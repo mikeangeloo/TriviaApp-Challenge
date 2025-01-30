@@ -146,7 +146,7 @@ export const TriviaChallenge = (): React.JSX.Element => {
                       {/* Show the correct answer if you missed it */}
                       {isSubmitted && value !== correctAnswer && (
                         <Text style={styles.correctAnswer}>
-                          Respuesta correcta: {correctAnswer} ✅
+                          Correct Answer: {correctAnswer} ✅
                         </Text>
                       )}
                     </View>
