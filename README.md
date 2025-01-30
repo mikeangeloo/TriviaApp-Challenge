@@ -31,6 +31,7 @@ Trivia App is a mobile application developed with React Native that allows users
    A lightweight and flexible solution for state management in React applications, with a simple and efficient API.
 8. **API Trivia**:
    Public API to obtain information from the Open Trivia Database.
+   UR: https://opentdb.com
 
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
